@@ -465,6 +465,7 @@ push_ofono_new(
                 ofono->manager_proxy, "modem-removed",
                 G_CALLBACK(push_ofono_modem_removed), ofono);
 
+            g_variant_unref(modems);
             return ofono;
         } else {
             PA_ERR("%s", PA_ERRMSG(error));
