@@ -23,7 +23,6 @@ oFono push agent
 %setup -q -n %{name}-%{version}
 
 %build
-pwd
 make release
 
 %install
