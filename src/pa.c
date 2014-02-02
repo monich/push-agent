@@ -29,6 +29,7 @@
  */
 
 #include "pa.h"
+#include "pa_dir.h"
 #include "pa_log.h"
 #include "pa_ofono.h"
 
@@ -38,7 +39,8 @@
 
 struct push_agent {
     const PushAgentConfig* config;
-    PushOfonoWatcher* watcher;
+    PushOfonoWatcher* ofono;
+    PushDirWatcher* config_watch;
     GSList* handlers;
     GMainLoop* loop;
 };
@@ -142,18 +144,28 @@ push_agent_parse_handler(
 }
 
 static
+gboolean
+push_agent_config_file_match(
+    const char* file)
+{
+    return g_str_has_suffix(file, ".conf");
+}
+
+static
 void
 push_agent_parse_config(
     PushAgent* agent)
 {
     const char* config_dir = agent->config->config_dir;
     GDir* dir = g_dir_open(config_dir, 0, NULL);
-    PA_ASSERT(!agent->handlers);
+    if (agent->handlers) {
+        g_slist_free_full(agent->handlers, push_handler_free);
+        agent->handlers = NULL;
+    }
     if (dir) {
         const gchar* file;
-        PA_INFO("Loading configuratin from %s", config_dir);
         while ((file = g_dir_read_name(dir)) != NULL) {
-            if (g_str_has_suffix(file, ".conf")) {
+            if (push_agent_config_file_match(file)) {
                 GError* error = NULL;
                 GKeyFile* conf = g_key_file_new();
                 char* path = g_strconcat(config_dir, "/", file, NULL);
@@ -176,6 +188,23 @@ push_agent_parse_config(
         g_dir_close(dir);
     } else {
         PA_WARN("%s directory not found", config_dir);
+    }
+}
+
+static
+void
+push_agent_config_changed(
+    PushAgent* agent,
+    const char* files[],
+    unsigned int count)
+{
+    unsigned int i;
+    for (i=0; i<count; i++) {
+        if (push_agent_config_file_match(files[i])) {
+            PA_INFO("Re-reading configuration");
+            push_agent_parse_config(agent);
+            break;
+        }
     }
 }
 
@@ -231,8 +260,11 @@ push_agent_new(
 {
     PushAgent* agent = g_new0(PushAgent, 1);
     agent->config = config;
-    agent->watcher = push_ofono_watcher_new(push_agent_notification, agent);
-    if (agent->watcher) {
+    agent->ofono = push_ofono_watcher_new(push_agent_notification, agent);
+    if (agent->ofono) {
+        agent->config_watch = push_dir_watcher_new(config->config_dir,
+            push_agent_config_changed, agent);
+        PA_INFO("Loading configuration from %s", config->config_dir);
         push_agent_parse_config(agent);
         return agent;
     } else {
@@ -247,7 +279,8 @@ push_agent_free(
 {
     if (agent) {
         PA_ASSERT(!agent->loop);
-        push_ofono_watcher_free(agent->watcher);
+        push_dir_watcher_free(agent->config_watch);
+        push_ofono_watcher_free(agent->ofono);
         g_slist_free_full(agent->handlers, push_handler_free);
         g_free(agent);
     }

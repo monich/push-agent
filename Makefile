@@ -16,7 +16,7 @@ all: debug release
 # Sources
 #
 
-SRC = main.c pa.c pa_log.c pa_ofono.c
+SRC = main.c pa.c pa_dir.c pa_log.c pa_ofono.c
 GEN_SRC = org.ofono.Manager.c org.ofono.Modem.c org.ofono.PushNotification.c \
   org.ofono.PushNotificationAgent.c org.ofono.SimManager.c
 

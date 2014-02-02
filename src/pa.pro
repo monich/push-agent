@@ -9,10 +9,12 @@ QMAKE_CFLAGS += -Wno-unused-parameter -Wno-missing-field-initializers
 SOURCES += \
   main.c \
   pa.c \
+  pa_dir.c \
   pa_log.c \
   pa_ofono.c
 HEADERS += \
   pa.h \
+  pa_dir.h \
   pa_log.h \
   pa_ofono.h
 OTHER_FILES += \
