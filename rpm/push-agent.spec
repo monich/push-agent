@@ -14,7 +14,7 @@ Requires(post):   systemd
 Requires(postun): systemd
 
 BuildRequires: pkgconfig(glib-2.0)
-buildRequires: pkgconfig(libwspcodec) >= 2.0
+BuildRequires: pkgconfig(libwspcodec) >= 2.0
 
 %description
 oFono push agent
