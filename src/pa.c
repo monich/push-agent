@@ -201,7 +201,7 @@ push_agent_config_changed(
     unsigned int i;
     for (i=0; i<count; i++) {
         if (push_agent_config_file_match(files[i])) {
-            PA_INFO("Re-reading configuration");
+            PA_INFO("Reloading configuration");
             push_agent_parse_config(agent);
             break;
         }
