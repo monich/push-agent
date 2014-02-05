@@ -13,6 +13,7 @@ Requires(preun):  systemd
 Requires(post):   systemd
 Requires(postun): systemd
 
+BuildRequires: python
 BuildRequires: pkgconfig(glib-2.0)
 BuildRequires: pkgconfig(libwspcodec) >= 2.0
 
