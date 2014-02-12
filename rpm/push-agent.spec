@@ -3,7 +3,7 @@ Summary:  oFono push agent
 Version:  1.0.0
 Release:  1
 Group:    Communications/Telephony and IM
-License:  BSD
+License:  GPLv2
 URL:      https://github.com/nemomobile/push-agent
 Source0:  %{name}-%{version}.tar.bz2
 Requires: dbus
