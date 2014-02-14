@@ -1,6 +1,6 @@
 Name:     push-agent
 Summary:  oFono push agent
-Version:  1.0.0
+Version:  1.1.0
 Release:  1
 Group:    Communications/Telephony and IM
 License:  GPLv2
