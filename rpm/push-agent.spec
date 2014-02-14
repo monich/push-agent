@@ -29,6 +29,7 @@ make release
 %install
 rm -rf %{buildroot}
 mkdir -p  %{buildroot}/%{_sbindir}
+mkdir -p %{buildroot}/%{_sysconfdir}/push-agent
 mkdir -p %{buildroot}/%{_lib}/systemd/system/
 mkdir -p %{buildroot}/%{_lib}/systemd/system/network.target.wants
 cp build/release/push-agent %{buildroot}/%{_sbindir}
@@ -47,6 +48,7 @@ systemctl daemon-reload
 
 %files
 %defattr(-,root,root,-)
+%dir %{_sysconfdir}/push-agent
 %{_sbindir}/push-agent
 /%{_lib}/systemd/system/push-agent.service
 /%{_lib}/systemd/system/network.target.wants/push-agent.service
