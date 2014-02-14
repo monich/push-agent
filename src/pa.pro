@@ -22,7 +22,9 @@ OTHER_FILES += \
   $$DBUS_SPEC_DIR/org.ofono.Modem.xml \
   $$DBUS_SPEC_DIR/org.ofono.PushNotification.xml \
   $$DBUS_SPEC_DIR/org.ofono.PushNotificationAgent.xml \
-  $$DBUS_SPEC_DIR/org.ofono.SimManager.xml
+  $$DBUS_SPEC_DIR/org.ofono.SimManager.xml \
+  $$_PRO_FILE_PWD_/../rpm/push-agent.spec \
+  $$_PRO_FILE_PWD_/../push-agent.service
 
 CONFIG(debug, debug|release) {
     DEFINES += DEBUG
