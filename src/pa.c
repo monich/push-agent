@@ -44,6 +44,7 @@ push_handler_notify(
     PushAgent* agent,
     PushHandler* handler,
     const char* imsi,
+    const char* content_type,
     const void* data,
     unsigned int len)
 {
@@ -52,8 +53,9 @@ push_handler_notify(
     if (bus) {
         GVariant* result;
         GVariantBuilder b;
-        g_variant_builder_init(&b, G_VARIANT_TYPE("(say)"));
+        g_variant_builder_init(&b, G_VARIANT_TYPE("(ssay)"));
         g_variant_builder_add(&b, "s", imsi);
+        g_variant_builder_add(&b, "s", content_type);
         g_variant_builder_add_value(&b, g_variant_new_from_data(
             G_VARIANT_TYPE_BYTESTRING, data, len, TRUE, NULL, NULL));
         result = g_dbus_connection_call_sync(bus, handler->service,
@@ -218,18 +220,21 @@ push_agent_notification(
         unsigned int off = 0;
         if (wsp_decode_uintvar(data, remain, &hdrlen, &off) &&
             (off + hdrlen) <= remain) {
-            const void* type = NULL;
+            const void* ct = NULL;
             data += off;
             remain -= off;
             PA_DEBUG("WAP header %u bytes", hdrlen);
-            if (wsp_decode_content_type(data, hdrlen, &type, &off, NULL)) {
-                PA_DEBUG("Content type %s", (char*)type);
+            if (wsp_decode_content_type(data, hdrlen, &ct, &off, NULL)) {
                 GSList* link = agent->handlers;
+                remain -= hdrlen;
+                data += hdrlen;
+                PA_DEBUG("WSP payload %u bytes", remain);
+                PA_DEBUG("Content type %s", (char*)ct);
                 while (link) {
-                    PushHandler* handler = link->data;
-                    if (push_handler_match(handler, type)) {
-                        PA_INFO("Notifying %s", handler->name);
-                        push_handler_notify(agent, handler, imsi, pdu, len);
+                    PushHandler* h = link->data;
+                    if (push_handler_match(h, ct)) {
+                        PA_INFO("Notifying %s", h->name);
+                        push_handler_notify(agent, h, imsi, ct, data, remain);
                     }
                     link = link->next;
                 }
