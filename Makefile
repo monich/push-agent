@@ -1,4 +1,4 @@
-# -*- Mode: makefile -*-
+# -*- Mode: gnu-makefile -*-
 
 .PHONY: all debug release clean
 
@@ -43,6 +43,14 @@ DEBUG_DEFS = -DDEBUG
 RELEASE_DEFS =
 WARN = -Wall
 CFLAGS = $(shell pkg-config --cflags $(PKGS)) -I$(SRC_DIR) -I$(GEN_DIR) -I. -MMD
+
+ifndef KEEP_SYMBOLS
+KEEP_SYMBOLS = 0
+endif
+
+ifneq ($(KEEP_SYMBOLS),0)
+RELEASE_FLAGS += -g
+endif
 
 DEBUG_CFLAGS = $(DEBUG_FLAGS) $(DEBUG_DEFS) $(CFLAGS)
 RELEASE_CFLAGS = $(RELEASE_FLAGS) $(RELEASE_DEFS) $(CFLAGS)
@@ -121,4 +129,6 @@ $(DEBUG_EXE): $(DEBUG_EXE_DEPS) $(DEBUG_OBJS)
 
 $(RELEASE_EXE): $(RELEASE_EXE_DEPS) $(RELEASE_OBJS)
 	$(LD) $(RELEASE_FLAGS) $(RELEASE_OBJS) $(RELEASE_LIBS) -o $@
+ifeq ($(KEEP_SYMBOLS),0)
 	strip $@
+endif

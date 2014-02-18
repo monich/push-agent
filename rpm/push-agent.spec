@@ -24,7 +24,7 @@ oFono push agent
 %setup -q -n %{name}-%{version}
 
 %build
-make release
+make KEEP_SYMBOLS=1 release
 
 %install
 rm -rf %{buildroot}
